@@ -22,7 +22,7 @@ defmodule MaxoDecompile.CoreTest do
             IO.puts("I'M INJECTED!")
           end
         end\
-        """ <- pretty_code(code)
+        """ <- pretty_elixir_code(code)
       )
     end
 
@@ -31,25 +31,52 @@ defmodule MaxoDecompile.CoreTest do
 
       auto_assert(
         """
-        defmodule MaxoDecompile.ExampleModule do
-          def unquote(:hey!)() do
-            IO.puts("HEY!!!")
-          end
+        -file("lib/maxo_decompile/example_module.ex", 11).
 
-          def hello() do
-            IO.puts("hello")
-          end
+        -module('Elixir.MaxoDecompile.ExampleModule').
 
-          def _HOLA() do
-            IO.puts("I'M INJECTED!")
-          end
-        end\
-        """ <- pretty_code(code)
+        -compile([no_auto_import]).
+
+        -export(['_HOLA'/0,'__info__'/1,hello/0,'hey!'/0]).
+
+        -spec '__info__'(attributes | compile | functions | macros | md5 |
+                         exports_md5 | module | deprecated | struct) ->
+                            any().
+
+        '__info__'(module) ->
+            'Elixir.MaxoDecompile.ExampleModule';
+        '__info__'(functions) ->
+            [{'_HOLA', 0}, {hello, 0}, {'hey!', 0}];
+        '__info__'(macros) ->
+            [];
+        '__info__'(struct) ->
+            nil;
+        '__info__'(exports_md5) ->
+            <<".­A{\\224\\007Þëmô\\eÑú\\236ï\\232">>;
+        '__info__'(Key = attributes) ->
+            erlang:get_module_info('Elixir.MaxoDecompile.ExampleModule', Key);
+        '__info__'(Key = compile) ->
+            erlang:get_module_info('Elixir.MaxoDecompile.ExampleModule', Key);
+        '__info__'(Key = md5) ->
+            erlang:get_module_info('Elixir.MaxoDecompile.ExampleModule', Key);
+        '__info__'(deprecated) ->
+            [].
+
+        '_HOLA'() ->
+            'Elixir.IO':puts(<<"I'M INJECTED!">>).
+
+        hello() ->
+            'Elixir.IO':puts(<<"hello">>).
+
+        'hey!'() ->
+            'Elixir.IO':puts(<<"HEY!!!">>).
+
+        """ <- code
       )
     end
   end
 
-  def pretty_code(code) do
+  def pretty_elixir_code(code) do
     IO.iodata_to_binary(code) |> Code.format_string!() |> IO.iodata_to_binary()
   end
 end
