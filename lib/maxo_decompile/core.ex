@@ -1,6 +1,5 @@
 defmodule MaxoDecompile.Core do
-  @allowed_formats ["ex", "erl", "asm", "diffasm", "kernel", "core", "expanded"]
-  def allowed_formats, do: @allowed_formats
+  alias MaxoDecompile.Util
 
   def run(modules, opts) do
     opts_as_map = Map.new(opts)
@@ -21,20 +20,12 @@ defmodule MaxoDecompile.Core do
   end
 
   def get_beam!(module_or_path) do
-    with :non_existing <- :code.which(module(module_or_path)),
+    with :non_existing <- :code.which(Util.module(module_or_path)),
          :non_existing <- :code.which(String.to_atom(module_or_path)),
          :non_existing <- get_beam_file(module_or_path),
-         :non_existing <- :code.where_is_file(basename(module_or_path)) do
+         :non_existing <- :code.where_is_file(Util.basename(module_or_path)) do
       Mix.raise("Could not find .beam file for #{module_or_path}")
     end
-  end
-
-  def module(string) do
-    Module.concat(String.split(string, "."))
-  end
-
-  def basename(path) do
-    String.to_charlist(Path.basename(path))
   end
 
   def get_beam_file(path) do
@@ -48,7 +39,7 @@ defmodule MaxoDecompile.Core do
   end
 
   def decompile(path, opts) do
-    format = get_format(opts)
+    format = Util.get_format(opts)
 
     case :beam_lib.chunks(path, [:debug_info]) do
       {:ok, {module, [debug_info: {:debug_info_v1, backend, data}]}} ->
@@ -64,18 +55,6 @@ defmodule MaxoDecompile.Core do
         Mix.raise("Invalid .beam file at #{path}")
     end
   end
-
-  defp get_format(%{to: format}), do: map_format(format)
-  defp get_format(_), do: Mix.raise("--to option is required (#{inspect(@allowed_formats)})")
-
-  defp map_format("ex"), do: :expanded
-  defp map_format("erl"), do: :erlang
-  defp map_format("asm"), do: :to_asm
-  defp map_format("diffasm"), do: :diff_asm
-  defp map_format("disasm"), do: :to_dis
-  defp map_format("kernel"), do: :to_kernel
-  defp map_format("core"), do: :to_core
-  defp map_format(other), do: String.to_atom(other)
 
   defp abstract_code_decompile(_path, :expanded) do
     Mix.raise("OTP 20 is required for decompiling to the expanded format")
@@ -167,7 +146,8 @@ defmodule MaxoDecompile.Core do
         {:ok, formatted} = :decompile_diffable_asm.format(res)
 
         File.open("#{module}.S", [:write], fn file ->
-          :decompile_diffable_asm.beam_listing(file, formatted)
+          # :decompile_diffable_asm.beam_listing(file, formatted)
+          :decompile_diffable_asm.beam_listing(:standard_io, formatted)
         end)
 
       {:error, error} ->
@@ -178,7 +158,7 @@ defmodule MaxoDecompile.Core do
   defp from_erlang_forms(format, module, forms) do
     case :compile.noenv_forms(forms, [format]) do
       {:ok, ^module, res} ->
-        File.open("#{module}.#{ext(format)}", [:write], fn _file ->
+        File.open("#{module}.#{Util.ext(format)}", [:write], fn _file ->
           # :beam_listing.module(file, res)
           # :beam_listing.module(IO.stream(:stdio, :line), res)
           :beam_listing.module(:standard_io, res)
@@ -190,9 +170,4 @@ defmodule MaxoDecompile.Core do
         )
     end
   end
-
-  defp ext(:to_core), do: "core"
-  defp ext(:to_kernel), do: "kernel"
-  defp ext(:to_asm), do: "S"
-  defp ext(other), do: other
 end
