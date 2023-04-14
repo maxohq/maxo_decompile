@@ -32,7 +32,7 @@ defmodule MaxoDecompile.MixProject do
 
   defp package do
     [
-      files: ~w(lib mix.exs README* CHANGELOG*),
+      files: ~w(lib src mix.exs README* CHANGELOG*),
       licenses: ["MIT"],
       links: %{
         "Github" => @github_url,
