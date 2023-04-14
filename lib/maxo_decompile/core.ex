@@ -1,7 +1,7 @@
 defmodule MaxoDecompile.Core do
   alias MaxoDecompile.Util
   alias MaxoDecompile.BeamFinder
-  alias MaxoDecompile.Abstract
+  alias MaxoDecompile.AbstractCode
   alias MaxoDecompile.ElixirFormatter
   alias MaxoDecompile.ErlangFormatter
 
@@ -31,10 +31,10 @@ defmodule MaxoDecompile.Core do
         from_debug_info(format, module, backend, data)
 
       {:error, :beam_lib, {:unknown_chunk, _, _}} ->
-        Abstract.abstract_code_decompile(path, format)
+        AbstractCode.decompile(path, format)
 
       {:error, :beam_lib, {:missing_chunk, _, _}} ->
-        Abstract.abstract_code_decompile(path, format)
+        AbstractCode.decompile(path, format)
 
       _ ->
         Mix.raise("Invalid .beam file at #{path}")
@@ -44,7 +44,7 @@ defmodule MaxoDecompile.Core do
   defp from_debug_info(:expanded, module, backend, data) do
     case backend.debug_info(:elixir_v1, module, data, []) do
       {:ok, elixir_info} ->
-        ElixirFormatter.format_elixir_info(module, elixir_info)
+        ElixirFormatter.elixir_info(module, elixir_info)
 
       {:error, error} ->
         Mix.raise(
@@ -56,10 +56,10 @@ defmodule MaxoDecompile.Core do
   defp from_debug_info(format, module, backend, data) do
     case backend.debug_info(:erlang_v1, module, data, []) do
       {:ok, erlang_forms} when format == :erlang ->
-        ErlangFormatter.format_erlang_forms(module, erlang_forms)
+        ErlangFormatter.do_erlang_forms(module, erlang_forms)
 
       {:ok, erlang_forms} ->
-        Abstract.from_erlang_forms(format, module, erlang_forms)
+        AbstractCode.from_erlang_forms(format, module, erlang_forms)
 
       {:error, error} ->
         Mix.raise(

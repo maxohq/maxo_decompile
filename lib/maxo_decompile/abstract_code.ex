@@ -1,12 +1,12 @@
-defmodule MaxoDecompile.Abstract do
+defmodule MaxoDecompile.AbstractCode do
   alias MaxoDecompile.ErlangFormatter
   # alias MaxoDecompile.Util
 
-  def abstract_code_decompile(_path, :expanded) do
+  def decompile(_path, :expanded) do
     Mix.raise("OTP 20 is required for decompiling to the expanded format")
   end
 
-  def abstract_code_decompile(path, format) do
+  def decompile(path, format) do
     case :beam_lib.chunks(path, [:abstract_code]) do
       {:ok, {module, erlang_forms}} ->
         from_abstract_code(format, module, erlang_forms)
@@ -17,7 +17,7 @@ defmodule MaxoDecompile.Abstract do
   end
 
   defp from_abstract_code(:erlang, module, forms) do
-    ErlangFormatter.format_erlang_forms(module, forms)
+    ErlangFormatter.do_erlang_forms(module, forms)
   end
 
   defp from_abstract_code(other, module, forms) do

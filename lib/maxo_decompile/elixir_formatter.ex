@@ -1,5 +1,5 @@
 defmodule MaxoDecompile.ElixirFormatter do
-  def format_elixir_info(module, elixir_info) do
+  def elixir_info(module, elixir_info) do
     data =
       [
         "defmodule ",
