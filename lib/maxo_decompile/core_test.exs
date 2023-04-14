@@ -5,7 +5,7 @@ defmodule MaxoDecompile.CoreTest do
 
   describe "pure_process" do
     test "works for elixir" do
-      {mod, code} = Core.pure_process("MaxoDecompile.ExampleModule", to: "ex")
+      {mod, code} = Core.pure_process("MaxoDecompile.ExampleModule", "ex")
 
       auto_assert(
         """
@@ -27,7 +27,7 @@ defmodule MaxoDecompile.CoreTest do
     end
 
     test "works for erlang" do
-      {mod, code} = Core.pure_process("MaxoDecompile.ExampleModule", to: "erl")
+      {mod, code} = Core.pure_process("MaxoDecompile.ExampleModule", "erl")
 
       auto_assert(
         """
@@ -76,7 +76,7 @@ defmodule MaxoDecompile.CoreTest do
     end
 
     test "works for asm" do
-      {mod, code} = Core.pure_process("MaxoDecompile.ExampleModule", to: "asm")
+      {mod, code} = Core.pure_process("MaxoDecompile.ExampleModule", "asm")
 
       auto_assert(
         """

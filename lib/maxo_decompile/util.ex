@@ -12,7 +12,8 @@ defmodule MaxoDecompile.Util do
   def map_format("disasm"), do: :to_dis
   def map_format("kernel"), do: :to_kernel
   def map_format("core"), do: :to_core
-  def map_format(other), do: String.to_atom(other)
+  def map_format(other) when is_binary(other), do: String.to_atom(other)
+  def map_format(other) when is_atom(other), do: other
 
   def ext(:to_core), do: "core"
   def ext(:to_kernel), do: "kernel"

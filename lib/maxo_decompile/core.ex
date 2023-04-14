@@ -10,7 +10,9 @@ defmodule MaxoDecompile.Core do
 
   def process(module_or_path, opts) do
     opts = Map.new(opts)
-    {module, data} = pure_process(module_or_path, opts)
+
+    format = Util.get_format(opts)
+    {module, data} = pure_process(module_or_path, format)
 
     if Map.get(opts, :stdout, true) do
       IO.puts(data)
@@ -21,13 +23,12 @@ defmodule MaxoDecompile.Core do
     {module, data}
   end
 
-  def pure_process(module_or_path, opts) do
-    BeamFinder.get!(module_or_path) |> decompile(Map.new(opts))
+  def pure_process(module_or_path, format) do
+    format = Util.map_format(format)
+    BeamFinder.get!(module_or_path) |> decompile(format)
   end
 
-  def decompile(path, opts) do
-    format = Util.get_format(opts)
-
+  def decompile(path, format) do
     case :beam_lib.chunks(path, [:debug_info]) do
       {:ok, {module, [debug_info: {:debug_info_v1, backend, data}]}} ->
         DebugInfo.from_debug_info(format, module, backend, data)
