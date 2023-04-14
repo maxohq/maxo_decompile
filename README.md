@@ -8,6 +8,12 @@
 This is a modifed and updated version from https://github.com/michalmuskala/decompile.
 It has tests and the code is more maintainable.
 
+## Installation
+
+```bash
+$ mix archive.install hex maxo_decompile
+```
+
 ## Usage
 
 ```bash
@@ -22,18 +28,6 @@ $ mix maxo.decompile MaxoDecompile.Core --to erl
 
 # prints ASM code to terminal
 $ mix maxo.decompile MaxoDecompile.Core --to asm
-```
-
-## Installation
-
-The package can be installed by adding `maxo_decompile` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:maxo_decompile, "~> 0.1"}
-  ]
-end
 ```
 
 The docs can be found at <https://hexdocs.pm/maxo_decompile>.
