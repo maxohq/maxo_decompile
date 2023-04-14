@@ -2,6 +2,8 @@ defmodule MaxoDecompile.Core do
   alias MaxoDecompile.Util
   alias MaxoDecompile.BeamFinder
   alias MaxoDecompile.Abstract
+  alias MaxoDecompile.ElixirFormatter
+  alias MaxoDecompile.ErlangFormatter
 
   def run(modules, opts) do
     opts_as_map = Map.new(opts)
@@ -42,7 +44,7 @@ defmodule MaxoDecompile.Core do
   defp from_debug_info(:expanded, module, backend, data) do
     case backend.debug_info(:elixir_v1, module, data, []) do
       {:ok, elixir_info} ->
-        format_elixir_info(module, elixir_info)
+        ElixirFormatter.format_elixir_info(module, elixir_info)
 
       {:error, error} ->
         Mix.raise(
@@ -54,7 +56,7 @@ defmodule MaxoDecompile.Core do
   defp from_debug_info(format, module, backend, data) do
     case backend.debug_info(:erlang_v1, module, data, []) do
       {:ok, erlang_forms} when format == :erlang ->
-        Abstract.format_erlang_forms(module, erlang_forms)
+        ErlangFormatter.format_erlang_forms(module, erlang_forms)
 
       {:ok, erlang_forms} ->
         Abstract.from_erlang_forms(format, module, erlang_forms)
@@ -64,33 +66,5 @@ defmodule MaxoDecompile.Core do
           "Failed to extract Erlang debug info for module #{inspect(module)}: #{inspect(error)}"
         )
     end
-  end
-
-  defp format_elixir_info(module, elixir_info) do
-    data =
-      [
-        "defmodule ",
-        inspect(module),
-        " do\n",
-        Enum.map(elixir_info.definitions, &format_definition/1),
-        "end\n"
-      ]
-      |> IO.iodata_to_binary()
-      |> Code.format_string!()
-
-    {module, data}
-  end
-
-  defp format_definition({{name, _arity}, kind, _meta, heads}) do
-    Enum.map(heads, fn {_meta, args, _what?, body} ->
-      fhead =
-        if Regex.match?(~r/^[a-zA-Z\d\_]+$/, "#{name}") do
-          ~s[  #{kind} #{name}(#{Enum.map_join(args, ", ", &Macro.to_string/1)}) do\n]
-        else
-          ~s[  #{kind} unquote(:"#{name}")(#{Enum.map_join(args, ", ", &Macro.to_string/1)}) do\n]
-        end
-
-      [fhead, Macro.to_string(body), "  end\n"]
-    end)
   end
 end
