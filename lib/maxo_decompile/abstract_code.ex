@@ -1,5 +1,6 @@
 defmodule MaxoDecompile.AbstractCode do
   alias MaxoDecompile.ErlangFormatter
+  alias MaxoDecompile.Util
 
   def decompile(_path, :expanded) do
     Mix.raise("OTP 20 is required for decompiling to the expanded format")
@@ -47,7 +48,12 @@ defmodule MaxoDecompile.AbstractCode do
         # File.open("#{module}.#{Util.ext(format)}", [:write], fn _file ->
         # :beam_listing.module(file, res)
         # :beam_listing.module(IO.stream(:stdio, :line), res)
-        :beam_listing.module(:standard_io, res)
+        filename = "#{module}.#{Util.ext(format)}"
+        {:ok, file} = StringIO.open(filename)
+        :beam_listing.module(file, res)
+        {_fname, content} = StringIO.contents(file)
+
+        {module, content}
 
       # end)
 
