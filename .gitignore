@@ -26,3 +26,6 @@ data/
 
 # Temporary files, for example, from tests.
 /tmp/
+
+# Decompiled files
+Elixir.*
