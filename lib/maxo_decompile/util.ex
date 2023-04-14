@@ -27,4 +27,11 @@ defmodule MaxoDecompile.Util do
   def basename(path) do
     String.to_charlist(Path.basename(path))
   end
+
+  def string_io(fun) do
+    {:ok, file} = StringIO.open("")
+    fun.(file)
+    {_fname, content} = StringIO.contents(file)
+    content
+  end
 end

@@ -25,20 +25,20 @@ defmodule MaxoDecompile.AbstractCode do
   end
 
   def from_erlang_forms(:diff_asm, module, forms) do
+    # This line writes a file to disk, no matter what
     case :compile.noenv_forms(forms, [:S]) do
       {:ok, ^module, res} ->
         {:ok, formatted} = :decompile_diffable_asm.format(res)
 
-        # File.open("#{module}.S", [:write], fn file ->
-        # :decompile_diffable_asm.beam_listing(file, formatted)
+        content =
+          Util.string_io(fn file ->
+            :decompile_diffable_asm.beam_listing(file, formatted)
+          end)
 
-        # {:ok, file} = StringIO.open("")
-        :decompile_diffable_asm.beam_listing(:standard_io, formatted)
+        {module, content}
 
-      # end)
-
-      {:error, error} ->
-        Mix.raise("Failed to compile to diffasm for module #{inspect(module)}: #{inspect(error)}")
+      _ ->
+        Mix.raise("Failed to compile to diffasm for module #{inspect(module)}}")
     end
   end
 
@@ -48,22 +48,15 @@ defmodule MaxoDecompile.AbstractCode do
   def from_erlang_forms(format, module, forms) do
     case :compile.noenv_forms(forms, [format]) do
       {:ok, ^module, res} ->
-        # File.open("#{module}.#{Util.ext(format)}", [:write], fn _file ->
-        # :beam_listing.module(file, res)
-        # :beam_listing.module(IO.stream(:stdio, :line), res)
-        filename = "#{module}.#{Util.ext(format)}"
-        {:ok, file} = StringIO.open(filename)
-        :beam_listing.module(file, res)
-        {_fname, content} = StringIO.contents(file)
+        content =
+          Util.string_io(fn file ->
+            :beam_listing.module(file, res)
+          end)
 
         {module, content}
 
-      # end)
-
-      {:error, error} ->
-        Mix.raise(
-          "Failed to compile to #{inspect(format)} for module #{inspect(module)}: #{inspect(error)}"
-        )
+      _ ->
+        Mix.raise("Failed to compile to #{inspect(format)} for module #{inspect(module)}}")
     end
   end
 end
