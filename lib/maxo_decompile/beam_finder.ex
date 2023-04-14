@@ -1,11 +1,7 @@
 defmodule MaxoDecompile.BeamFinder do
   alias MaxoDecompile.Util
 
-  def get(path) do
-    get_beam!(path)
-  end
-
-  def get_beam!(module_or_path) do
+  def get!(module_or_path) do
     with :non_existing <- :code.which(Util.module(module_or_path)),
          :non_existing <- :code.which(String.to_atom(module_or_path)),
          :non_existing <- get_beam_file(module_or_path),
