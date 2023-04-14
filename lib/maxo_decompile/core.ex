@@ -10,16 +10,14 @@ defmodule MaxoDecompile.Core do
 
   def process(module_or_path, opts) do
     opts = Map.new(opts)
-    format = Util.get_format(opts)
+    format = Util.get_format!(opts)
     {module, data} = pure_process(module_or_path, format)
 
     if Map.get(opts, :stdout, true) do
       IO.puts(data)
     else
-      File.write("#{module}.ex", data)
+      File.write(Util.filename(module, format), data)
     end
-
-    {module, data}
   end
 
   def pure_process(module_or_path, format) do

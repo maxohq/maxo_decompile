@@ -2,8 +2,8 @@ defmodule MaxoDecompile.Util do
   @allowed_formats ["ex", "erl", "asm", "diffasm", "kernel", "core", "expanded"]
   def allowed_formats, do: @allowed_formats
 
-  def get_format(%{to: format}), do: map_format(format)
-  def get_format(_), do: Mix.raise("--to option is required (#{inspect(@allowed_formats)})")
+  def get_format!(%{to: format}), do: map_format(format)
+  def get_format!(_), do: Mix.raise("--to option is required (#{inspect(@allowed_formats)})")
 
   def map_format("ex"), do: :expanded
   def map_format("erl"), do: :erlang
@@ -26,6 +26,10 @@ defmodule MaxoDecompile.Util do
 
   def basename(path) do
     String.to_charlist(Path.basename(path))
+  end
+
+  def filename(module, format) do
+    "#{module}.#{ext(format)}"
   end
 
   def string_io(fun) do
