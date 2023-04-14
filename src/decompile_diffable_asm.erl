@@ -99,38 +99,6 @@ label(Old, D) when is_integer(Old) ->
     maps:get(Old, D).
 
 %%%
-%%% Run tasks in parallel.
-%%%
-
-p_run(Test, List) ->
-    N = erlang:system_info(schedulers) * 2,
-    p_run_loop(Test, List, N, [], 0).
-
-p_run_loop(_, [], _, [], Errors) ->
-    io:put_chars("\r \n"),
-    case Errors of
-	0 ->
-            ok;
-	N ->
-	    io:format("~p errors\n", [N]),
-            halt(1)
-    end;
-p_run_loop(Test, [H|T], N, Refs, Errors) when length(Refs) < N ->
-    {_,Ref} = erlang:spawn_monitor(fun() -> exit(Test(H)) end),
-    p_run_loop(Test, T, N, [Ref|Refs], Errors);
-p_run_loop(Test, List, N, Refs0, Errors0) ->
-    io:format("\r~p ", [length(List)+length(Refs0)]),
-    receive
-	{'DOWN',Ref,process,_,Res} ->
-	    Errors = case Res of
-                         ok -> Errors0;
-                         error -> Errors0 + 1
-                     end,
-	    Refs = Refs0 -- [Ref],
-	    p_run_loop(Test, List, N, Refs, Errors)
-    end.
-
-%%%
 %%% Borrowed from beam_listing and tweaked.
 %%%
 
