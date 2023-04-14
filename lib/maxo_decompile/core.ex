@@ -1,4 +1,4 @@
-defmodule Decompile.Decompiler do
+defmodule MaxoDecompile.Core do
   @allowed_formats ["ex", "erl", "asm", "diffasm", "kernel", "core", "expanded"]
   def allowed_formats, do: @allowed_formats
 
@@ -11,7 +11,7 @@ defmodule Decompile.Decompiler do
     opts = Map.new(opts)
     {module, data} = module_or_path |> get_beam!() |> decompile(opts)
 
-    if Map.get(opts, :stdout) do
+    if Map.get(opts, :stdout, true) do
       IO.puts(data)
     else
       File.write("#{module}.ex", data)
@@ -124,13 +124,6 @@ defmodule Decompile.Decompiler do
 
   defp from_abstract_code(other, module, forms) do
     from_erlang_forms(other, module, forms)
-    # case :compile.noenv_forms(forms, [:to_core]) do
-    #   {:ok, ^module, core} ->
-    #     from_core(other, module, core)
-
-    #   {:ok, ^module, core, _warnings} ->
-    #     from_core(other, module, core)
-    # end
   end
 
   defp format_elixir_info(module, elixir_info) do
