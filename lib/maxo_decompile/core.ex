@@ -2,17 +2,15 @@ defmodule MaxoDecompile.Core do
   alias MaxoDecompile.Util
   alias MaxoDecompile.BeamFinder
   alias MaxoDecompile.AbstractCode
-  alias MaxoDecompile.ElixirFormatter
-  alias MaxoDecompile.ErlangFormatter
+  alias MaxoDecompile.DebugInfo
 
   def run(modules, opts) do
-    opts_as_map = Map.new(opts)
-    Enum.each(modules, &process(&1, opts_as_map))
+    Enum.each(modules, &process(&1, opts))
   end
 
   def process(module_or_path, opts) do
     opts = Map.new(opts)
-    {module, data} = module_or_path |> BeamFinder.get!() |> decompile(opts)
+    {module, data} = pure_process(module_or_path, opts)
 
     if Map.get(opts, :stdout, true) do
       IO.puts(data)
@@ -23,12 +21,16 @@ defmodule MaxoDecompile.Core do
     {module, data}
   end
 
+  def pure_process(module_or_path, opts) do
+    BeamFinder.get!(module_or_path) |> decompile(Map.new(opts))
+  end
+
   def decompile(path, opts) do
     format = Util.get_format(opts)
 
     case :beam_lib.chunks(path, [:debug_info]) do
       {:ok, {module, [debug_info: {:debug_info_v1, backend, data}]}} ->
-        from_debug_info(format, module, backend, data)
+        DebugInfo.from_debug_info(format, module, backend, data)
 
       {:error, :beam_lib, {:unknown_chunk, _, _}} ->
         AbstractCode.decompile(path, format)
@@ -38,33 +40,6 @@ defmodule MaxoDecompile.Core do
 
       _ ->
         Mix.raise("Invalid .beam file at #{path}")
-    end
-  end
-
-  defp from_debug_info(:expanded, module, backend, data) do
-    case backend.debug_info(:elixir_v1, module, data, []) do
-      {:ok, elixir_info} ->
-        ElixirFormatter.elixir_info(module, elixir_info)
-
-      {:error, error} ->
-        Mix.raise(
-          "Failed to extract Elixir debug info for module #{inspect(module)}: #{inspect(error)}"
-        )
-    end
-  end
-
-  defp from_debug_info(format, module, backend, data) do
-    case backend.debug_info(:erlang_v1, module, data, []) do
-      {:ok, erlang_forms} when format == :erlang ->
-        ErlangFormatter.do_erlang_forms(module, erlang_forms)
-
-      {:ok, erlang_forms} ->
-        AbstractCode.from_erlang_forms(format, module, erlang_forms)
-
-      {:error, error} ->
-        Mix.raise(
-          "Failed to extract Erlang debug info for module #{inspect(module)}: #{inspect(error)}"
-        )
     end
   end
 end
