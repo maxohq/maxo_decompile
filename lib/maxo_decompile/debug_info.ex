@@ -3,7 +3,7 @@ defmodule MaxoDecompile.DebugInfo do
   alias MaxoDecompile.ElixirFormatter
   alias MaxoDecompile.ErlangFormatter
 
-  def from_debug_info(:expanded, module, backend, data) do
+  def decompile(:expanded, module, backend, data) do
     case backend.debug_info(:elixir_v1, module, data, []) do
       {:ok, elixir_info} ->
         ElixirFormatter.elixir_info(module, elixir_info)
@@ -15,7 +15,7 @@ defmodule MaxoDecompile.DebugInfo do
     end
   end
 
-  def from_debug_info(format, module, backend, data) do
+  def decompile(format, module, backend, data) do
     case backend.debug_info(:erlang_v1, module, data, []) do
       {:ok, erlang_forms} when format == :erlang ->
         ErlangFormatter.do_erlang_forms(module, erlang_forms)

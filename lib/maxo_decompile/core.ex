@@ -10,7 +10,6 @@ defmodule MaxoDecompile.Core do
 
   def process(module_or_path, opts) do
     opts = Map.new(opts)
-
     format = Util.get_format(opts)
     {module, data} = pure_process(module_or_path, format)
 
@@ -31,7 +30,7 @@ defmodule MaxoDecompile.Core do
   def decompile(path, format) do
     case :beam_lib.chunks(path, [:debug_info]) do
       {:ok, {module, [debug_info: {:debug_info_v1, backend, data}]}} ->
-        DebugInfo.from_debug_info(format, module, backend, data)
+        DebugInfo.decompile(format, module, backend, data)
 
       {:error, :beam_lib, {:unknown_chunk, _, _}} ->
         AbstractCode.decompile(path, format)
