@@ -156,7 +156,8 @@ defmodule MaxoDecompile.Core do
 
   defp format_erlang_forms(module, erlang_forms) do
     File.open("#{module}.erl", [:write], fn file ->
-      Enum.each(erlang_forms, &IO.puts(file, :erl_pp.form(&1)))
+      # Enum.each(erlang_forms, &IO.puts(file, :erl_pp.form(&1)))
+      Enum.each(erlang_forms, &IO.puts(:standard_io, :erl_pp.form(&1)))
     end)
   end
 
@@ -177,8 +178,10 @@ defmodule MaxoDecompile.Core do
   defp from_erlang_forms(format, module, forms) do
     case :compile.noenv_forms(forms, [format]) do
       {:ok, ^module, res} ->
-        File.open("#{module}.#{ext(format)}", [:write], fn file ->
-          :beam_listing.module(file, res)
+        File.open("#{module}.#{ext(format)}", [:write], fn _file ->
+          # :beam_listing.module(file, res)
+          # :beam_listing.module(IO.stream(:stdio, :line), res)
+          :beam_listing.module(:standard_io, res)
         end)
 
       {:error, error} ->
