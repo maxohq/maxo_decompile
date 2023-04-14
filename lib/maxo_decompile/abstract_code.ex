@@ -42,6 +42,9 @@ defmodule MaxoDecompile.AbstractCode do
     end
   end
 
+  @doc """
+  Brocken for :to_dis format, not sure if fixing is needed
+  """
   def from_erlang_forms(format, module, forms) do
     case :compile.noenv_forms(forms, [format]) do
       {:ok, ^module, res} ->
