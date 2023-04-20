@@ -36,3 +36,17 @@ The docs can be found at <https://hexdocs.pm/maxo_decompile>.
 
 - https://github.com/hrzndhrn/beam_file (much cleaner code and support for different Elixir versions, recommended!)
 - https://github.com/michalmuskala/decompile
+
+
+## Support
+
+<p>
+  <a href="https://quantor.consulting/?utm_source=github&utm_campaign=maxo_decompile">
+    <img src="https://raw.githubusercontent.com/maxohq/sponsors/main/assets/quantor_consulting_logo.svg"
+      alt="Sponsored by Quantor Consulting" width="210">
+  </a>
+</p>
+
+## License
+
+The lib is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
