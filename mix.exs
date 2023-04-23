@@ -16,7 +16,8 @@ defmodule MaxoDecompile.MixProject do
       test_pattern: "*_test.exs",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      package: package()
+      package: package(), 
+      docs: [extras: ["README.md"]]
     ]
   end
 
