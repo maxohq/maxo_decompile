@@ -1,8 +1,11 @@
 # MaxoDecompile
 
-[![Hex.pm](https://img.shields.io/hexpm/v/maxo_decompile.svg)](https://hex.pm/packages/maxo_decompile)
-[![Docs](https://img.shields.io/badge/hexdocs-docs-8e7ce6.svg)](https://hexdocs.pm/maxo_decompile)
-[![CI](https://github.com/maxohq/maxo_decompile/actions/workflows/ci.yml/badge.svg)](https://github.com/maxohq/maxo_decompile/actions/workflows/ci.yml)
+[![CI](https://github.com/maxohq/maxo_decompile/actions/workflows/ci.yml/badge.svg?style=flat)](https://github.com/maxohq/maxo_decompile/actions/workflows/ci.yml)
+[![Hex.pm](https://img.shields.io/hexpm/v/maxo_decompile.svg?style=flat)](https://hex.pm/packages/maxo_decompile)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg?style=flat)](https://hexdocs.pm/maxo_decompile/)
+[![Total Downloads](https://img.shields.io/hexpm/dt/maxo_decompile.svg?style=flat)](https://hex.pm/packages/maxo_decompile)
+[![Licence](https://img.shields.io/hexpm/l/maxo_decompile.svg?style=flat)](https://github.com/maxohq/maxo_decompile/blob/main/LICENCE)
+
 
 `MaxoDecompile` is an Elixir / Erlang code decompiler.
 This is a modifed and updated version from https://github.com/michalmuskala/decompile.
